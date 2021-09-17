@@ -1,6 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-import datetime
+from datetime import datetime
 
 url = 'http://802timing.com/results/21results/runresults/9.11.21sproutyoverall.htm'
 page = requests.get(url)
@@ -26,6 +26,17 @@ for row in rows:
     except:
         pass
 
+def format_time_for_spreadsheet(s):
+    """ we want 00:20:05 instead of 20:05
+    """
+    colon_count = s.count(":")
+    assert colon_count in [1,2]
+    if colon_count == 1:
+        t = datetime.strptime(s,"%M:%S")
+    else:
+        t = datetime.strptime(s,"%H:%M:%S")
+    return t.strftime("%H:%M:%S")
+
 print("\nFIRST NAMES\n")
 for x in first_names:
     print(x)
@@ -34,9 +45,8 @@ for x in last_names:
     print(x)
 print("\nNET TIMES\n")
 for x in net_times:
-    print(x)
+    print(format_time_for_spreadsheet(x))
 
-def format_time_for_spreadsheet(s):
-    """ we want 00:20:05 instead of 20:05
-    """
-    pass
+# tests
+assert format_time_for_spreadsheet("20:05") == "00:20:05"
+assert format_time_for_spreadsheet("1:23:05") == "01:23:05"
